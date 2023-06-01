@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+
+    <head>
+        <meta charset="UTF-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link href="//db.onlinewebfonts.com/c/35c8dd5006b186a4bcfaebc6670f805f?family=Skyfont" rel="stylesheet" type="text/css"/>
+        <title>Document</title>
+        <style>
+            body {
+                background-color: black;
+                color: aliceblue;
+                font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+            }
+
+            ul#impostometro {
+                list-style-type: '.';
+                display: flex;
+            }
+
+            ul#impostometro li {
+                padding-left: 0.1rem;
+                padding-right: 0.5rem;
+                display: grid;
+                margin-left: 0.1rem;
+            }
+
+            ul#impostometro li:first-child {
+                list-style: none;
+            }
+
+            ul#impostometro li > span {
+                text-align: center;
+            }
+
+            ul#impostometro li > span:first-child {
+                text-align: center;
+                font-size: 3rem;
+                letter-spacing: calc(1rem);
+                font-family: "Skyfont";
+            }
+        </style>
+    </head>
+
+    <body>
+        <h5>Impostos pagos</h5>
+        <ul id="impostometro"></ul>
+        <hr>
+        <script>
+            function atualizarImpostometro(valor) {
+            let valorComoMoeda = valor.toLocaleString( //'R$ 123.456.789,01'
+                'pt-BR',
+                {
+                    style:  'currency',
+                    currency: 'BRL',
+                    minimumFractionDigits: 2
+                }
+            )
+
+            let impostometroContainer = document.querySelector('#impostometro');
+            impostometroContainer.innerHTML = '';
+
+            let valores = valorComoMoeda;
+            valores = valores.split('R$').pop().trim();
+            centavos = valores.split(',').pop();
+            valores = valores.split(',').shift().split('.');
+            valores.push(centavos);
+            valores.reverse();
+
+            let positionName = [
+                'centavos',
+                'reais',
+                'mil',
+                'milhões',
+                'bilhões',
+                'trilhões',
+            ];
+
+            valores.forEach((val, key) => {
+                if (!positionName[key]) {
+                    return;
+                }
+
+                let listItem = document.createElement('li');
+
+                listItem.setAttribute('data-position', positionName[key]);
+                listItem.innerHTML = `
+                    <span>${val}</span>
+                    <span>${positionName[key]}</span>
+                `;
+
+                impostometroContainer.prepend(listItem)
+            })
+        }
+
+        function getInitialValue () {
+            let date = new Date();
+            let value =  date.getYear() + date.getDay() + '' +
+                date.getSeconds() + date.getDay() +
+                date.getDay() + + date.getMilliseconds();
+
+            return parseFloat(value);
+        }
+
+        window.impostometroValor = getInitialValue();
+        window.impostometroValorContadorId = setInterval(() => {
+            let date = new Date();
+            let toSum = (date.getMilliseconds() % 5) === 0
+                ? '0.9' + date.getMilliseconds()
+                : '0.' + date.getMilliseconds() +''+ date.getSeconds();
+
+            window.impostometroValor = window.impostometroValor + parseFloat(toSum);
+            atualizarImpostometro(window.impostometroValor);
+        }, 500);
+        </script>
+    </body>
+
+</html>
