@@ -20,9 +20,13 @@
         <title>Impostometro Fake</title>
         <style>
             body {
-                background-color: black;
-                color: aliceblue;
-                font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+                /*
+                    background-color: black;
+                    background-color: dimgray;
+                    color: aliceblue;
+                */
+
+                font-family: Arial, Helvetica, sans-serif, 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
             }
 
             ul#impostometro {
@@ -31,31 +35,50 @@
             }
 
             ul#impostometro li {
-                padding-left: 0.1rem;
-                padding-right: 0.5rem;
                 display: grid;
-                margin-left: 0.1rem;
+                /* background-color: green; */
+                text-align: center;
+                /* padding: 0.15rem; */
+                border-radius: 10px;
+                margin-left: 0.2rem;
             }
 
             ul#impostometro li:first-child {
                 list-style: none;
+                margin-left: 0 !important;
+                text-align: center;
+            }
+
+            ul#impostometro li:first-child span:last-of-type {
+                /* margin-left: -0.2em; */
+                display: contents;
             }
 
             ul#impostometro li > span {
+                width: 100%;
+                font-size: 1.4em;
+                padding: 0;
                 text-align: center;
+                text-transform: capitalize;
+                margin-left: 0.1rem;
             }
 
             ul#impostometro li > span:first-child {
+                letter-spacing: -0.2rem;
                 text-align: center;
-                font-size: 4.5rem;
-                letter-spacing: calc(1rem);
+                font-size: 10rem;
                 font-family: "Skyfont";
+                color: green;
             }
         </style>
     </head>
 
     <body>
         <h5>Impostos pagos</h5>
+        <div>
+            <button type="button" onclick="pararContador()">Parar contador</button>
+            <button type="button" onclick="iniciarContador()" style="display: none;">Iniciar contador</button>
+        </div>
         <ul id="impostometro"></ul>
         <hr>
         <script>
@@ -107,23 +130,67 @@
 
         function getInitialValue () {
             let date = new Date();
-            let value =  date.getYear() + date.getDay() + '' +
+            let value =  date.getYear() + '' +
                 date.getSeconds() + date.getDay() +
                 date.getDay() + + date.getMilliseconds();
 
             return parseFloat(value);
         }
 
-        window.impostometroValor = getInitialValue();
-        window.impostometroValorContadorId = setInterval(() => {
-            let date = new Date();
-            let toSum = (date.getMilliseconds() % 5) === 0
-                ? '0.9' + date.getMilliseconds()
-                : '0.' + date.getMilliseconds() +''+ date.getSeconds();
+        function iniciarContador() {
+            if (window.impostometroValorContadorId) {
+                return
+            }
 
-            window.impostometroValor = window.impostometroValor + parseFloat(toSum);
-            atualizarImpostometro(window.impostometroValor);
-        }, 500);
+            window.impostometroValorContadorId = setInterval(() => {
+                let date = new Date();
+                let toSum = (date.getMilliseconds() % 5) === 0
+                    ? '0.9' + date.getMilliseconds()
+                    : '0.' + date.getMilliseconds() +''+ date.getSeconds();
+
+                window.impostometroValor = window.impostometroValor + parseFloat(toSum);
+                atualizarImpostometro(window.impostometroValor);
+            }, 500);
+
+            let iniciarContador = document.querySelector('button[type="button"][onclick^="iniciarContador"]');
+
+            if (iniciarContador && iniciarContador?.style) {
+                iniciarContador.style.display = 'none';
+            }
+
+            let pararContador = document.querySelector('button[type="button"][onclick^="pararContador"]');
+
+            if (pararContador && pararContador?.style) {
+                pararContador.style.display = 'block';
+            }
+
+        }
+
+        function pararContador() {
+            if (!window.impostometroValorContadorId) {
+                return
+            }
+
+            clearInterval(window.impostometroValorContadorId);
+            window.impostometroValorContadorId = null
+
+            let iniciarContador = document.querySelector('button[type="button"][onclick^="iniciarContador"]');
+
+            if (iniciarContador && iniciarContador?.style) {
+                iniciarContador.style.display = 'block';
+            }
+
+            let pararContador = document.querySelector('button[type="button"][onclick^="pararContador"]');
+
+            if (pararContador && pararContador?.style) {
+                pararContador.style.display = 'none';
+            }
+
+        }
+
+        window.impostometroValor = getInitialValue();
+
+        iniciarContador()
         </script>
     </body>
 
