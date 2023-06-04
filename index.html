@@ -35,7 +35,9 @@
             }
 
             ul#impostometro li {
-                display: grid;
+                /* display: grid; */
+                display: inline-table;
+
                 /* background-color: green; */
                 text-align: center;
                 /* padding: 0.15rem; */
@@ -49,40 +51,71 @@
                 text-align: center;
             }
 
-            ul#impostometro li:first-child span:last-of-type {
-                /* margin-left: -0.2em; */
-                display: contents;
+            .label-container {
+                align-content: end;
+                display: grid;
+                font-size: 0.6rem;
+                text-align: center;
             }
 
-            ul#impostometro li > span {
-                width: 100%;
+            ul#impostometro li .label-container span {
+                color: #001378;
                 font-size: 1.4em;
+                text-transform: capitalize;
+
+                width: 100%;
+                padding: 0;
+                /* margin-left: 0.9rem; */
+                display: inline-table;
+                font-size: 1.2rem;
+            }
+
+            ul#impostometro li > .letter-container {
+                /* display: flex; */
+                /* letter-spacing: -0.2rem; */
+                text-align: center;
+                font-size: 1.5rem;
+                margin-left: 0.3rem;
+                /* font-family: "Skyfont"; */
+                /* margin-bottom: 0.9em; /*  */
+                margin-bottom: 0.9rem; /* */
+            }
+
+            ul#impostometro li > .letter-container:first-child span {
+                /* width: 100%; */
+                font-size: 1.7em;
                 padding: 0;
                 text-align: center;
-                text-transform: capitalize;
-                margin-left: 0.1rem;
+                margin-left: 0.4rem;
+
+                font-family: sans-serif;
+                line-height: 2em;
+                font-stretch: expanded;
+                background-color: #5eb608;
+                font-weight: bold;
+                color: #ffffff;
+                border-radius: 4px;
+
+                /* Se quiser deixar sombra na letra, remova a linha abaixo */
+                box-shadow: 0 2px 5px #00000080;
+                padding: 0.8rem 0.9rem;
             }
 
-            ul#impostometro li > span:first-child {
-                letter-spacing: -0.2rem;
-                text-align: center;
-                font-size: 10rem;
-                font-family: "Skyfont";
-                color: green;
+            .grid-container, ul#impostometro li > .letter-container {
+                /* display: grid; */
+                /* grid-template-columns: repeat(3, 1fr); */
+                /* grid-gap: 0.05rem; */
             }
+
         </style>
     </head>
 
     <body>
-        <h5>Impostos pagos</h5>
-        <div>
-            <button type="button" onclick="pararContador()">Parar contador</button>
-            <button type="button" onclick="iniciarContador()" style="display: none;">Iniciar contador</button>
-        </div>
+
         <ul id="impostometro"></ul>
-        <hr>
-        <script>
-            function atualizarImpostometro(valor) {
+
+    <script>
+        function atualizarImpostometro(valor) {
             let valorComoMoeda = valor.toLocaleString( //'R$ 123.456.789,01'
                 'pt-BR',
                 {
@@ -118,10 +151,25 @@
 
                 let listItem = document.createElement('li');
 
+                val = Number(val);
+
+                if (positionName[key] === 'centavos') {
+                    val = val.toString().padStart(2, '0')
+                }
+
                 listItem.setAttribute('data-position', positionName[key]);
+                // <div class="letter-container">${val}</div>
+                let numberAsSpan = val
+                    .toString()
+                    .split('')
+                    .map(letter => `<span class="letter">${letter}</span>`).join(``);
                 listItem.innerHTML = `
-                    <span>${val}</span>
-                    <span>${positionName[key]}</span>
+                    <div class="letter-container">
+                        ${numberAsSpan}
+                    </div>
+                    <div class="label-container">
+                        <span>${positionName[key]}</span>
+                    </div>
                 `;
 
                 impostometroContainer.prepend(listItem)
@@ -133,6 +181,9 @@
             let value =  date.getYear() + '' +
                 date.getSeconds() + date.getDay() +
                 date.getDay() + + date.getMilliseconds();
+
+            let unixTimestamp = Math.floor(Date.now() / 1000); // Alternativa
+            value = unixTimestamp;
 
             return parseFloat(value);
         }
@@ -191,7 +242,7 @@
         window.impostometroValor = getInitialValue();
 
         iniciarContador()
-        </script>
+    </script>
     </body>
 
 </html>
